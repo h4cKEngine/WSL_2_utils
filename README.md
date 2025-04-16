@@ -1,5 +1,6 @@
 # WSL 2.0 Utility
 This repo is based on the move-distribution.ps1 script made by freemansoft.
+
 Check it for more useful info about WSL 2: https://github.com/freemansoft/wsl2-utils or directly in the wsl2-utils-main.zip
 
 Make sure to get enoght space both in C: and in D: drives.
@@ -14,8 +15,10 @@ PowerShell -NoProfile -ExecutionPolicy Bypass -File .\install-and-move-distro.ps
 
 ## To move an existing distro:
 ```powershell
-PowerShell -NoProfile -ExecutionPolicy Bypass -File ./move-distribution.ps1 -WslSourceName "NameDistroHere" -DiskUnitSelected "D:"
+PowerShell -NoProfile -ExecutionPolicy Bypass -File .\move-distribution.ps1 -WslSourceName "NameDistroHere" -DiskUnitSelected "D:"
 ```
+
+Both scripts set the downloaded distro as default wsl distribution (done in move-distribution.ps1).
 
 ### To check available online distros:
 ```powershell
@@ -29,8 +32,8 @@ wsl --list
 
 ### If necessary, unblock the downloaded files:
 ```powershell
-Unblock-File -Path "./move-distribution.ps1"
-Unblock-File -Path "./install-and-move-distro.ps1"
+Unblock-File -Path ".\install-and-move-distro.ps1"
+Unblock-File -Path ".\move-distribution.ps1"
 ```
 
 ## Options
