@@ -1,74 +1,73 @@
 [CmdletBinding()]
 param(
-    # Specifica l'unità di destinazione su cui spostare la distribuzione (es. "T:")
+    # Specifies the destination drive where the distribution will be moved (e.g., "T:")
     [Parameter(Mandatory = $true)]
     [string]$DiskUnitSelected,
 
-    # Modalità non distruttiva: se attivo, le operazioni di unregister/import non verranno eseguite
+    # Non-destructive mode: if enabled, unregister/import operations will not be performed
     [Parameter(Mandatory = $false)]
     [switch]$NonDestructive
 )
 
-# Controlla se lo script è eseguito con privilegi di amministratore
+# Check if the script is running with administrator privileges
 $principal = New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())
 if (-not $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
-    Write-Output "Script non eseguito con privilegi di amministratore. Riavvio in modalità elevata..."
+    Write-Output "Script is not running with administrator privileges. Restarting with elevated privileges..."
     $arguments = "-NoProfile -ExecutionPolicy Bypass -File `"$PSCommandPath`" " + $args
     Start-Process PowerShell -Verb RunAs -ArgumentList $arguments
     exit
 }
 
-# Mostra la lista delle distribuzioni disponibili
-Write-Output "Ecco la lista delle distribuzioni WSL disponibili:"
+# Display the list of available WSL distributions
+Write-Output "Here is the list of available WSL distributions:"
 $availableDistros = wsl --list -o | Out-String
 Write-Output $availableDistros
 
-# Chiede all'utente di selezionare la distribuzione desiderata
-$distroName = Read-Host "Seleziona la tua distribuzione (es. 'Ubuntu-22.04')"
+# Ask the user to select the desired distribution
+$distroName = Read-Host "Select your distribution (e.g., 'Ubuntu-22.04')"
 
-Write-Output "Installazione su C: e poi spostamento su $DiskUnitSelected in corso..."
+Write-Output "Installing on C: and then moving to $DiskUnitSelected..."
 
-# Verifica se la distribuzione è già installata
+# Check if the distribution is already installed
 $installedDistroNames = wsl --list --quiet | Out-String
 if ($installedDistroNames -match $distroName) {
-    Write-Output "La distribuzione $distroName è già installata. Procedo con lo spostamento..."
+    Write-Output "The distribution $distroName is already installed. Proceeding with the move..."
 }
 else {
-    # Ciclo per tentare l'installazione finché non va a buon fine.
+    # Loop to attempt installation until it is successful.
     do {
-        Write-Output "Installazione della distribuzione $distroName in corso..."
+        Write-Output "Installing the distribution $distroName..."
         wsl --install -d $distroName
         
         if ($LASTEXITCODE -eq 0) {
             break
         }
         else {
-            Write-Output "Errore durante l'installazione della distribuzione '$distroName'."
-            Write-Output "`nSelezionare una distribuzione dalla colonna NAME e non dalla colonna FRIENDLY NAME e riprovare."
-
-            $distroName = Read-Host "Reinserisci la tua distribuzione (es. 'Ubuntu-22.04')"
+            Write-Output "Error installing the distribution '$distroName'."
+            Write-Output "`nSelect a distribution from the NAME column and not the FRIENDLY NAME column, then try again."
+            $distroName = Read-Host "Re-enter your distribution (e.g., 'Ubuntu-22.04')"
         }
     } while ($true)
 
-    Write-Output "Attendere qualche minuto per completare l'installazione..."
+    Write-Output "Waiting a few minutes to complete the installation..."
     Start-Sleep -Seconds 30
-    Write-Output "Installazione completata."
+    Write-Output "Installation complete."
 }
 
-Write-Output "Spostamento nel disco $DiskUnitSelected in corso..."
+Write-Output "Moving to drive $DiskUnitSelected..."
 
-# Definisce i percorsi per l'export e per la nuova destinazione
+# Define the paths for export and for the new destination
 $exportDir = "$DiskUnitSelected\wsl-export"
 $destDir = "$DiskUnitSelected\wsl"
 
 if ($NonDestructive) {
-    Write-Output "Modalità non distruttiva abilitata: le operazioni di unregister e import non verranno eseguite."
+    Write-Output "Non-destructive mode enabled: unregister and import operations will not be performed."
     $executeFlag = $false
 } else {
     $executeFlag = $true
 }
 
-# Richiama lo script move-distribution.ps1 passando i parametri necessari
+# Call the move-distribution.ps1 script, passing the required parameters
 .\move-distribution.ps1 -WslSourceName $distroName -ExportDir $exportDir -DestDir $destDir -ExecuteUnregisterImport $executeFlag
 
-Write-Output "Spostamento completato."
+Write-Output "Move complete."

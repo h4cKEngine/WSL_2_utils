@@ -18,13 +18,13 @@ param (
     [String]$WslSourceName = "kali-linux",
 
     # the target locaton for the distribution backup
-    [String]$ExportDir = "I:\wsl-export",
+    [String]$ExportDir = "D:\wsl-export",
     # the filename of the backup - default adds timestame to avoid overwrite
     [String]$WslExportName =
     "$WslSourceName-$(get-date -f yyyyMMdd-HHmmss).tar",
 
     # the target location for the new distribution vhdx file
-    [String]$DestDir = "I:\wsl",
+    [String]$DestDir = "D:\wsl",
     # the destination WSL distribution name defaults to src
     [String]$WslDestName = $WslSourceName,
     # make this new distribution the default distribution
