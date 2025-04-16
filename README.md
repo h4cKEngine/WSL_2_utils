@@ -19,6 +19,11 @@ PowerShell -NoProfile -ExecutionPolicy Bypass -File .\move-distribution.ps1 -Wsl
 ```
 
 Both scripts set the downloaded distro as default wsl distribution (done in move-distribution.ps1).
+To change this:
+```powershell
+wsl --set-default NameDistroHere
+wsl --manage NameDistroHere --set-default-user username
+```
 
 ### To check available online distros:
 ```powershell
